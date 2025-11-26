@@ -1,0 +1,43 @@
+name: EduTrack CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    # recuperer le code
+    - uses: actions/checkout@v3
+
+    # installer nodejs
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    # installer les dependances backend
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        npm ci
+
+    # installer les dependances frontend
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    # verifier que le frontend compile
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm run build
